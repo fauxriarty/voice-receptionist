@@ -12,15 +12,10 @@ def get_sheets_service():
     return service
 
 def log_call_data(call_data: Dict[str, Any]) -> None:
-    """
-    appends call_data to the google sheet.
-    each dictionary key becomes a column in the appended row.
-    """
     try:
         service = get_sheets_service()
         sheet = service.spreadsheets()
 
-        # sort keys for consistent ordering
         row_values = []
         for key in sorted(call_data.keys()):
             row_values.append(str(call_data[key]))

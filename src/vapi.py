@@ -5,7 +5,7 @@ from .config import VAPI_API_KEY, VAPI_BASE_URL, PHONE_NUMBER_ID
 def start_outbound_call(assistant_id: str, user_phone: str) -> Tuple[Optional[str], str]:
     """
     triggers an outbound phone call to user_phone using the given assistant.
-    returns a tuple of (call_id, debug_log).
+    returns (call_id, debug_log).
     """
     debug_log = []
     url = f"{VAPI_BASE_URL}/call"
@@ -45,13 +45,11 @@ def start_outbound_call(assistant_id: str, user_phone: str) -> Tuple[Optional[st
 def get_call_data(call_id: str) -> Tuple[Dict[str, Any], str]:
     """
     fetches call details from vapi after the call completes.
-    returns a tuple of (call_data, debug_log).
+    returns (call_data, debug_log).
     """
     debug_log = []
     url = f"{VAPI_BASE_URL}/call/{call_id}"
-    headers = {
-        "Authorization": f"Bearer {VAPI_API_KEY}"
-    }
+    headers = {"Authorization": f"Bearer {VAPI_API_KEY}"}
     debug_log.append(f"fetching call data for call_id: {call_id}")
 
     try:
