@@ -4,9 +4,16 @@ from src.gsheets import log_call_data
 from src.email import send_confirmation_email
 from src.conv_flow import handle_outbound_receptionist
 
-def extract_email_from_transcript(transcript: str) -> str:
-    pattern = r"[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+"
-    match = re.search(pattern, transcript)
+def parse_spelled_out_email(transcript: str) -> str:
+    replaced = transcript.lower()
+    replaced = replaced.replace("'", "")
+    replaced = replaced.replace(",", "")
+    replaced = replaced.replace(" dot ", ".")
+    replaced = replaced.replace(" at ", "@")
+    replaced = replaced.replace("g mail", "gmail")
+
+    pattern = r'[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+'
+    match = re.search(pattern, replaced)
     return match.group(0) if match else ""
 
 def main() -> None:
@@ -25,11 +32,9 @@ def main() -> None:
         call_id = input("enter call id to fetch data: ").strip()
         call_data, debug_log = get_call_data(call_id)
 
-        found_email = extract_email_from_transcript(call_data.get("transcript", ""))
+        found_email = parse_spelled_out_email(call_data.get("transcript", ""))
 
-        combined_debug_log = (
-            f"--- get call data debug ---\n{debug_log}"
-        )
+        combined_debug_log = f"--- get call data debug ---\n{debug_log}"
 
         data_to_log = {
             "Call ID": call_data.get("call_id", ""),
@@ -38,6 +43,11 @@ def main() -> None:
             "Duration": str(call_data.get("duration", 0)),
             "Transcript": call_data.get("transcript", ""),
             "Found Email": found_email,
+            "Start Time": call_data.get("started_at", ""),
+            "End Time": call_data.get("ended_at", ""),
+            "Recording URL": call_data.get("recording_url", ""),
+            "Call Summary": call_data.get("analysis_summary", ""),
+            "Cost": str(call_data.get("cost", 0)),
             "Debug Info": combined_debug_log
         }
 

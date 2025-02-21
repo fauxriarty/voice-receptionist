@@ -16,6 +16,7 @@ def log_call_data(call_data: Dict[str, Any]) -> None:
         service = get_sheets_service()
         sheet = service.spreadsheets()
 
+        # define a fixed column order for 12 columns
         column_order = [
             "Call ID",
             "Status",
@@ -23,12 +24,17 @@ def log_call_data(call_data: Dict[str, Any]) -> None:
             "Duration",
             "Transcript",
             "Found Email",
+            "Start Time",
+            "End Time",
+            "Recording URL",
+            "Call Summary",
+            "Cost",
             "Debug Info"
         ]
 
+        # build row in that exact order
         row_values = []
         for col in column_order:
-            # if a key is missing, default to empty string
             row_values.append(str(call_data.get(col, "")))
 
         body = {"values": [row_values]}
