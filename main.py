@@ -1,4 +1,3 @@
-# main.py
 import re
 from src.vapi import get_call_data
 from src.gsheets import log_call_data
