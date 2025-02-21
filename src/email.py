@@ -4,6 +4,7 @@ from typing import NoReturn
 from .config import EMAIL_HOST, EMAIL_PORT, EMAIL_USER, EMAIL_PASSWORD
 
 def send_confirmation_email(to_email: str, appointment_info: str) -> NoReturn:
+    print(f"DEBUG: sending email from {EMAIL_USER} to {to_email} using {EMAIL_HOST}:{EMAIL_PORT}")
     body = (
         f"hello,\n\n"
         f"this is to confirm your appointment:\n{appointment_info}\n\n"

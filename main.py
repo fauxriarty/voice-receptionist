@@ -2,19 +2,8 @@ import re
 from src.vapi import get_call_data
 from src.gsheets import log_call_data
 from src.email import send_confirmation_email
-from src.conv_flow import handle_outbound_receptionist
+from src.conv_flow import handle_outbound_receptionist, parse_spelled_out_email
 
-def parse_spelled_out_email(transcript: str) -> str:
-    replaced = transcript.lower()
-    replaced = replaced.replace("'", "")
-    replaced = replaced.replace(",", "")
-    replaced = replaced.replace(" dot ", ".")
-    replaced = replaced.replace(" at ", "@")
-    replaced = replaced.replace("g mail", "gmail")
-
-    pattern = r'[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+'
-    match = re.search(pattern, replaced)
-    return match.group(0) if match else ""
 
 def main() -> None:
     print("welcome to the voice ai receptionist testing system.")

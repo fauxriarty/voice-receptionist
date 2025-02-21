@@ -12,10 +12,15 @@ def parse_spelled_out_email(transcript: str) -> str:
     replaced = replaced.replace(" dot ", ".")
     replaced = replaced.replace(" at ", "@")
     replaced = replaced.replace("g mail", "gmail")
-
-    pattern = r'[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+'
+    replaced = replaced.replace(" ", "")
+    pattern = r"[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+"
     match = re.search(pattern, replaced)
-    return match.group(0) if match else ""
+    if match:
+        email = match.group(0)
+        email = re.sub(r'[.,;:?!]+$', '', email)
+        return email
+    return ""
+
 
 def handle_outbound_receptionist(assistant_id: str) -> None:
     print("please enter your phone number in e.164 format (e.g. +91...):")

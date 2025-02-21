@@ -1,4 +1,5 @@
 import requests
+from dateutil import parser as dateutil_parser
 from typing import Dict, Any, Optional, Tuple
 from .config import VAPI_API_KEY, VAPI_BASE_URL, PHONE_NUMBER_ID
 
@@ -24,7 +25,6 @@ def start_outbound_call(assistant_id: str, user_phone: str) -> Tuple[Optional[st
     try:
         response = requests.post(url, json=payload, headers=headers, timeout=10)
         debug_log.append(f"vapi response status: {response.status_code}")
-        # truncate the response text to first 300 chars
         resp_text = response.text
         truncated = resp_text[:300] + ("..." if len(resp_text) > 300 else "")
         debug_log.append(f"vapi response text (truncated): {truncated}")
@@ -32,7 +32,6 @@ def start_outbound_call(assistant_id: str, user_phone: str) -> Tuple[Optional[st
         data = response.json()
         call_id = data.get("id")
         debug_log.append(f"outbound call started with id: {call_id}")
-        # final debug log
         return call_id, "\n".join(debug_log)
     except requests.RequestException as e:
         err_msg = f"error starting outbound call: {e}"
@@ -52,7 +51,6 @@ def get_call_data(call_id: str) -> Tuple[Dict[str, Any], str]:
     try:
         response = requests.get(url, headers=headers, timeout=10)
         debug_log.append(f"vapi response status: {response.status_code}")
-        # truncate response text
         resp_text = response.text
         truncated = resp_text[:300] + ("..." if len(resp_text) > 300 else "")
         debug_log.append(f"vapi response text (truncated): {truncated}")
@@ -60,18 +58,27 @@ def get_call_data(call_id: str) -> Tuple[Dict[str, Any], str]:
         response.raise_for_status()
         data = response.json()
 
-        # parse additional fields
         started_at = data.get("startedAt", "")
         ended_at = data.get("endedAt", "")
         analysis_summary = data.get("analysis", {}).get("summary", "")
         recording_url = data.get("artifact", {}).get("recordingUrl", "")
-        cost = data.get("cost", 0)  # total cost
+        cost = data.get("cost", 0)
+
+        # parse duration from started/ended times
+        call_duration = 0
+        if started_at and ended_at:
+            try:
+                start_dt = dateutil_parser.parse(started_at)
+                end_dt = dateutil_parser.parse(ended_at)
+                call_duration = int((end_dt - start_dt).total_seconds())
+            except Exception:
+                pass  # if parsing fails, we'll keep 0
 
         call_data = {
             "call_id": call_id,
             "call_status": data.get("status", "unknown"),
             "ended_reason": data.get("endedReason", "none"),
-            "duration": data.get("costBreakdown", {}).get("transport", 0),
+            "duration": call_duration,
             "transcript": data.get("artifact", {}).get("transcript", ""),
             "started_at": started_at,
             "ended_at": ended_at,
