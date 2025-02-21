@@ -15,7 +15,6 @@ def handle_outbound_receptionist(assistant_id: str) -> None:
 
     call_id, start_debug = start_outbound_call(assistant_id, user_phone)
     if not call_id:
-        # call creation failed; log partial data
         data_to_log = {
             "Call ID": "none",
             "Status": "failed to start",
@@ -31,12 +30,10 @@ def handle_outbound_receptionist(assistant_id: str) -> None:
     print("call started. wait for the call to complete, then press enter...")
     input("press enter after the call has ended on your phone...")
 
-    # fetch call data
     call_data, get_debug = get_call_data(call_id)
     transcript = call_data.get("transcript", "")
     found_email = extract_email_from_transcript(transcript)
 
-    # combine the debug logs
     combined_debug_log = (
         "--- start outbound call debug ---\n"
         f"{start_debug}\n\n"

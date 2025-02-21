@@ -16,9 +16,20 @@ def log_call_data(call_data: Dict[str, Any]) -> None:
         service = get_sheets_service()
         sheet = service.spreadsheets()
 
+        column_order = [
+            "Call ID",
+            "Status",
+            "Reason Ended",
+            "Duration",
+            "Transcript",
+            "Found Email",
+            "Debug Info"
+        ]
+
         row_values = []
-        for key in sorted(call_data.keys()):
-            row_values.append(str(call_data[key]))
+        for col in column_order:
+            # if a key is missing, default to empty string
+            row_values.append(str(call_data.get(col, "")))
 
         body = {"values": [row_values]}
         sheet.values().append(

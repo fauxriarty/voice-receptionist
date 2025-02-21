@@ -25,15 +25,12 @@ def main() -> None:
         call_id = input("enter call id to fetch data: ").strip()
         call_data, debug_log = get_call_data(call_id)
 
-        # parse email from transcript
         found_email = extract_email_from_transcript(call_data.get("transcript", ""))
 
-        # build a single debug log
         combined_debug_log = (
             f"--- get call data debug ---\n{debug_log}"
         )
 
-        # unify all fields into one dictionary
         data_to_log = {
             "Call ID": call_data.get("call_id", ""),
             "Status": call_data.get("call_status", ""),
@@ -44,10 +41,8 @@ def main() -> None:
             "Debug Info": combined_debug_log
         }
 
-        # log to google sheets
         log_call_data(data_to_log)
 
-        # optionally send an email if found
         if found_email:
             send_confirmation_email(found_email, "appointment details: 10 am tomorrow (example)")
             print("sent confirmation email to:", found_email)
